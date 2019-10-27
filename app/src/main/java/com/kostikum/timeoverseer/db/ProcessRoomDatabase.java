@@ -7,14 +7,28 @@ import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-import com.kostikum.timeoverseer.entity.Process;
+import com.kostikum.timeoverseer.db.converter.DateConverter;
+import com.kostikum.timeoverseer.db.dao.ProcessDao;
+import com.kostikum.timeoverseer.db.dao.ProjectDao;
+import com.kostikum.timeoverseer.db.entity.Process;
+import com.kostikum.timeoverseer.db.entity.Project;
 
-@Database(entities = {Process.class}, version = 1)
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
+
+@Database(entities = {Process.class, Project.class}, version = 1)
+@TypeConverters(DateConverter.class)
 public abstract class ProcessRoomDatabase extends RoomDatabase {
 
     public abstract ProcessDao processDao();
+    public abstract ProjectDao projectDao();
+
     private static volatile ProcessRoomDatabase INSTANCE;
 
     public static ProcessRoomDatabase getDatabase(final Context context) {
@@ -22,7 +36,7 @@ public abstract class ProcessRoomDatabase extends RoomDatabase {
             synchronized (ProcessRoomDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            ProcessRoomDatabase.class, "process_database")
+                            ProcessRoomDatabase.class, "database")
                             .addCallback(sRoomDatabaseCallback)
                             .build();
                 }
@@ -41,17 +55,62 @@ public abstract class ProcessRoomDatabase extends RoomDatabase {
 
     private static class PopulateDbAsync extends AsyncTask<Void, Void, Void> {
 
-        private ProcessDao mDao;
+        private ProcessDao mProcessDao;
+        private ProjectDao mProjectDao;
 
         PopulateDbAsync(ProcessRoomDatabase db) {
-            mDao = db.processDao();
+            mProcessDao = db.processDao();
+            mProjectDao = db.projectDao();
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mDao.insert(new Process("programming", "100"));
-            mDao.insert(new Process("walking", "30"));
-            mDao.insert(new Process("cooking", "10"));
+
+            Date date = new Date();
+            Date date2 = new Date();
+            date2.setDate(2);
+
+            DateFormat dateFormat1 = DateFormat.getDateInstance();
+
+            Date todayWithZeroTime = date;
+
+            try {
+                todayWithZeroTime = dateFormat1.parse(dateFormat1.format(date));
+            } catch (ParseException e) {
+            }
+
+            try {
+                todayWithZeroTime = dateFormat1.parse(dateFormat1.format(date2));
+            } catch (ParseException e) {
+                todayWithZeroTime = date;
+            }
+
+            Project pr1 = new Project("Программирование", "Синий");
+            Project pr2 = new Project("Прогулка", "Жёлтый");
+            Project pr3 = new Project("Вязание", "Красный");
+            Project pr4 = new Project("Whistle blowing", "Blue");
+
+            mProjectDao.insert(pr1);
+            mProjectDao.insert(pr2);
+            mProjectDao.insert(pr3);
+            mProjectDao.insert(pr4);
+            mProjectDao.insert(pr4);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+
+            mProcessDao.insert(new Process(todayWithZeroTime, 1,"25 min"));
+            mProcessDao.insert(new Process(todayWithZeroTime, 2, "158 hours"));
+            mProcessDao.insert(new Process(todayWithZeroTime, 4, "100 солнечных лет"));
+            mProcessDao.insert(new Process(todayWithZeroTime, 4, "100 солнечных дней"));
+
+
+
+
             return null;
         }
     }

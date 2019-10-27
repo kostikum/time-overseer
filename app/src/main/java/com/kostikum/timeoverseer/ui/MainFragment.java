@@ -1,6 +1,6 @@
 package com.kostikum.timeoverseer.ui;
 
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -23,11 +23,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.kostikum.timeoverseer.R;
 import com.kostikum.timeoverseer.adapters.ProcessListAdapter;
 import com.kostikum.timeoverseer.adapters.ProjectListAdapter;
-import com.kostikum.timeoverseer.entity.Process;
-import com.kostikum.timeoverseer.entity.Project;
+import com.kostikum.timeoverseer.adapters.ListItem;
+import com.kostikum.timeoverseer.db.entity.Project;
+import com.kostikum.timeoverseer.viewmodel.MainViewModel;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
 
 public class MainFragment extends Fragment {
@@ -38,7 +38,11 @@ public class MainFragment extends Fragment {
     private ProcessListAdapter processAdapter;
     private ProjectListAdapter projectAdapter;
 
-    public static MainFragment newInstance() {
+    private TextView timeKeeperTitleTextView;
+    private TextView timeKeeperTimeTextView;
+    private LinearLayout timeKeeperLayout;
+
+    static MainFragment newInstance() {
         return new MainFragment();
     }
 
@@ -50,42 +54,40 @@ public class MainFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         behavior = BottomSheetBehavior.from(view.findViewById(R.id.bottom_sheet));
         behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
-
-
-
-
-
-
+        timeKeeperLayout = view.findViewById(R.id.timekeeper_layout);
+        timeKeeperTitleTextView = view.findViewById(R.id.timekeeper_title_textview);
+        timeKeeperTimeTextView = view.findViewById(R.id.timekeeper_time_textview);
 
         RecyclerView processRecyclerView = view.findViewById(R.id.processes_recyclerview);
         processRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        processAdapter = new ProcessListAdapter(getContext());
+        processAdapter = new ProcessListAdapter(getContext(), projectCallback, dateCallback);
         processRecyclerView.setAdapter(processAdapter);
 
         RecyclerView projectsRecyclerView = view.findViewById(R.id.projects_recyclerview);
         projectsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        projectAdapter = new ProjectListAdapter(getContext());
+        projectAdapter = new ProjectListAdapter(getContext(), projectCallback);
         projectsRecyclerView.setAdapter(projectAdapter);
 
-        List<Project> projects = new ArrayList<>();
-        projects.add(new Project("Проект 1", "Красный"));
-        projects.add(new Project("Проект 2", "Синий"));
-        projects.add(new Project("Проект 3", "Зелёный"));
-        projects.add(new Project("Проект 4", "Белый"));
-
-        projectAdapter.setProjectsList(projects);
+        view.findViewById(R.id.timekeeper_stop_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                timeKeeperLayout.setVisibility(View.GONE);
+            }
+        });
 
         FloatingActionButton startButton = view.findViewById(R.id.add_project_button);
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mViewModel.insert(new Process("thinking", "1"));
+                if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                    ((MainActivity) getActivity()).showCreateProjectFragment();
+                }
             }
         });
     }
@@ -93,14 +95,38 @@ public class MainFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        processAdapter.setProcessesList(mViewModel.getAllProcesses().getValue());
-        mViewModel.getAllProcesses().observe(this, new Observer<List<Process>>() {
+        mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        processAdapter.setProcessesList(mViewModel.getAllListItems().getValue());
+        mViewModel.getAllListItems().observe(this, new Observer<List<ListItem>>() {
             @Override
-            public void onChanged(List<Process> processes) {
+            public void onChanged(List<ListItem> listItems) {
                 behavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
-                processAdapter.setProcessesList(processes);
+                processAdapter.setProcessesList(listItems);
+            }
+        });
+        mViewModel.getAllProjects().observe(this, new Observer<List<Project>>() {
+            @Override
+            public void onChanged(List<Project> projects) {
+                projectAdapter.setProjectsList(projects);
             }
         });
     }
+
+    private final ProjectCallback projectCallback = new ProjectCallback() {
+        @Override
+        public void onClick(Project project) {
+            timeKeeperTitleTextView.setText(project.getName());
+            timeKeeperTimeTextView.setText(project.getColor());
+            timeKeeperLayout.setVisibility(View.VISIBLE);
+        }
+    };
+
+    private final DateCallback dateCallback = new DateCallback() {
+        @Override
+        public void onClick(Date date) {
+            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                ((MainActivity) getActivity()).showDatePieFragment(date);
+            }
+        }
+    };
 }

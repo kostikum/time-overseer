@@ -4,57 +4,119 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kostikum.timeoverseer.R;
-import com.kostikum.timeoverseer.entity.Process;
+import com.kostikum.timeoverseer.db.entity.Project;
+import com.kostikum.timeoverseer.ui.DateCallback;
+import com.kostikum.timeoverseer.ui.ProjectCallback;
 
 import java.util.List;
+import java.util.ArrayList;
 
-public class ProcessListAdapter extends RecyclerView.Adapter<ProcessListAdapter.ProcessViewHolder> {
+public class ProcessListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private List<Process> processes;
+    private List<ListItem> consolidatedList = new ArrayList<>();
     private LayoutInflater inflater;
+    private ProjectCallback projectCallback;
+    private DateCallback dateCallback;
 
-    public ProcessListAdapter(Context context) {
-        inflater = LayoutInflater.from(context);
+    public ProcessListAdapter(Context context, ProjectCallback projectCallback, DateCallback dateCallback) {
+        this.inflater = LayoutInflater.from(context);
+        this.projectCallback = projectCallback;
+        this.dateCallback = dateCallback;
     }
 
     @NonNull
     @Override
-    public ProcessViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = inflater.inflate(R.layout.recyclerview_process_item, parent, false);
-        return new ProcessViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+
+        RecyclerView.ViewHolder holder = null;
+
+        switch (viewType) {
+            case ListItem.TYPE_DATE:
+                View viewDate = inflater
+                        .inflate(R.layout.recyclerview_date_item, parent, false);
+                holder = new DateViewHolder(viewDate);
+                break;
+            case ListItem.TYPE_GENERAL:
+                View viewProcess = inflater
+                        .inflate(R.layout.recyclerview_process_item, parent, false);
+                holder = new ProcessViewHolder(viewProcess);
+                break;
+        }
+        return holder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProcessViewHolder holder, int position) {
-        Process process = processes.get(position);
-        holder.titleTextView.setText(process.getProject());
-        holder.durationTextView.setText(process.getDuration());
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        switch (holder.getItemViewType()) {
+            case ListItem.TYPE_DATE:
+                final DateItem dateItem = (DateItem) consolidatedList.get(position);
+                DateViewHolder dateViewHolder = (DateViewHolder) holder;
+                dateViewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dateCallback.onClick(dateItem.getDate());
+                    }
+                });
+                dateViewHolder.dateTextView.setText(dateItem.getDate().toString());
+                break;
+            case ListItem.TYPE_GENERAL:
+                GeneralItem generalItem = (GeneralItem) consolidatedList.get(position);
+                ProcessViewHolder processViewHolder = (ProcessViewHolder) holder;
+                processViewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        projectCallback.onClick(new Project("тестовый", "бесцветный"));
+                    }
+                });
+                processViewHolder.titleTextView.setText(generalItem.getProject().getName());
+                processViewHolder.durationTextView.setText(generalItem.getProcess().getDuration());
+                break;
+        }
     }
 
     @Override
     public int getItemCount() {
-        return processes != null ? processes.size() : 0;
+        return consolidatedList == null ? 0 : consolidatedList.size();
     }
 
-    public void setProcessesList(List<Process> list) {
-        processes = list;
+    @Override
+    public int getItemViewType(int position) {
+        return consolidatedList.get(position).getType();
+    }
+
+    public void setProcessesList(List<ListItem> list) {
+        consolidatedList = list;
         notifyDataSetChanged();
     }
 
     class ProcessViewHolder extends RecyclerView.ViewHolder {
+        FrameLayout frameLayout;
         TextView titleTextView;
         TextView durationTextView;
 
         ProcessViewHolder(@NonNull View itemView) {
             super(itemView);
+            frameLayout = itemView.findViewById(R.id.rv_process_item_layout);
             titleTextView = itemView.findViewById(R.id.process_title_textview);
             durationTextView = itemView.findViewById(R.id.process_duration_textview);
+        }
+    }
+
+    class DateViewHolder extends RecyclerView.ViewHolder {
+        FrameLayout frameLayout;
+        TextView dateTextView;
+
+        DateViewHolder(@NonNull View itemView) {
+            super(itemView);
+            frameLayout = itemView.findViewById(R.id.rv_date_item_layout);
+            dateTextView = itemView.findViewById(R.id.date_textview);
         }
     }
 }

@@ -4,13 +4,15 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kostikum.timeoverseer.R;
-import com.kostikum.timeoverseer.entity.Project;
+import com.kostikum.timeoverseer.db.entity.Project;
+import com.kostikum.timeoverseer.ui.ProjectCallback;
 
 import java.util.List;
 
@@ -18,9 +20,11 @@ public class ProjectListAdapter extends RecyclerView.Adapter<ProjectListAdapter.
 
     private List<Project> projects;
     private LayoutInflater inflater;
+    private ProjectCallback projectCallback;
 
-    public ProjectListAdapter(Context context) {
-        inflater = LayoutInflater.from(context);
+    public ProjectListAdapter(Context context, ProjectCallback callback) {
+        this.inflater = LayoutInflater.from(context);
+        this.projectCallback = callback;
     }
 
     @NonNull
@@ -32,7 +36,13 @@ public class ProjectListAdapter extends RecyclerView.Adapter<ProjectListAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ProjectViewHolder holder, int position) {
-        Project project = projects.get(position);
+        final Project project = projects.get(position);
+        holder.frameLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                projectCallback.onClick(project);
+            }
+        });
         holder.nameTextView.setText(project.getName());
         holder.colorTextView.setText(project.getColor());
     }
@@ -48,11 +58,13 @@ public class ProjectListAdapter extends RecyclerView.Adapter<ProjectListAdapter.
     }
 
     class ProjectViewHolder extends RecyclerView.ViewHolder {
+        FrameLayout frameLayout;
         TextView nameTextView;
         TextView colorTextView;
 
         ProjectViewHolder(@NonNull View itemView) {
             super(itemView);
+            frameLayout = itemView.findViewById(R.id.rv_project_item_layout);
             nameTextView = itemView.findViewById(R.id.project_name_textview);
             colorTextView = itemView.findViewById(R.id.project_color_textview);
         }

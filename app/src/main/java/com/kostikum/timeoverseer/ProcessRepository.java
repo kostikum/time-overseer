@@ -5,36 +5,65 @@ import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 
-import com.kostikum.timeoverseer.entity.Process;
-import com.kostikum.timeoverseer.db.ProcessDao;
+import com.kostikum.timeoverseer.db.dao.ProjectDao;
+import com.kostikum.timeoverseer.db.entity.Process;
+import com.kostikum.timeoverseer.db.dao.ProcessDao;
 import com.kostikum.timeoverseer.db.ProcessRoomDatabase;
+import com.kostikum.timeoverseer.db.entity.ProcessWithProject;
+import com.kostikum.timeoverseer.db.entity.Project;
 
+import java.util.Date;
 import java.util.List;
 
 public class ProcessRepository {
 
     private ProcessDao mProcessDao;
+    private ProjectDao mProjectDao;
+
     private LiveData<List<Process>> mAllProcesses;
+    private LiveData<List<ProcessWithProject>> mAllProcessesWithProjects;
+    private LiveData<List<Project>> mAllProjects;
 
     public ProcessRepository(Application application) {
         ProcessRoomDatabase database = ProcessRoomDatabase.getDatabase(application);
+
         mProcessDao = database.processDao();
         mAllProcesses = mProcessDao.getAllProcesses();
+        mAllProcessesWithProjects = mProcessDao.getProcessesWithProjects();
+
+        mProjectDao = database.projectDao();
+        mAllProjects = mProjectDao.getAllProjects();
     }
 
     public LiveData<List<Process>> getAllProcesses() {
         return mAllProcesses;
     }
 
-    public void insert(Process process) {
-        new InsertAsyncTask(mProcessDao).execute(process);
+    public LiveData<List<ProcessWithProject>> getAllProcessesWithProjects() {
+        return mAllProcessesWithProjects;
     }
 
-    private static class InsertAsyncTask extends AsyncTask<Process, Void, Void> {
+    public List<Process> getProcessesByDate(Date date) {
+        return mProcessDao.getProcessesByDate(date);
+    }
+
+    public LiveData<List<Project>> getAllProjects() {
+        return mAllProjects;
+    }
+
+    public void insert(Process process) {
+        new InsertProcessAsyncTask(mProcessDao).execute(process);
+    }
+
+    public void insert(Project project) {
+        new InsertProjectAsyncTask(mProjectDao).execute(project);
+    }
+
+    private static class InsertProcessAsyncTask extends AsyncTask<Process, Void, Void> {
 
         private ProcessDao mAsyncTaskDao;
 
-        InsertAsyncTask(ProcessDao dao) {
+        InsertProcessAsyncTask(ProcessDao dao) {
             this.mAsyncTaskDao = dao;
         }
 
@@ -44,4 +73,19 @@ public class ProcessRepository {
             return null;
         }
     }
+    private static class InsertProjectAsyncTask extends AsyncTask<Project, Void, Void> {
+
+        private ProjectDao mAsyncTaskDao;
+
+        InsertProjectAsyncTask(ProjectDao dao) {
+            this.mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final Project... params) {
+            mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
+    }
+
 }
