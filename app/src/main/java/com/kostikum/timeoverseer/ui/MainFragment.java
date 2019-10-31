@@ -24,6 +24,7 @@ import com.kostikum.timeoverseer.R;
 import com.kostikum.timeoverseer.adapters.ProcessListAdapter;
 import com.kostikum.timeoverseer.adapters.ProjectListAdapter;
 import com.kostikum.timeoverseer.adapters.ListItem;
+import com.kostikum.timeoverseer.db.entity.Process;
 import com.kostikum.timeoverseer.db.entity.Project;
 import com.kostikum.timeoverseer.viewmodel.MainViewModel;
 
@@ -116,8 +117,11 @@ public class MainFragment extends Fragment {
         @Override
         public void onClick(Project project) {
             timeKeeperTitleTextView.setText(project.getName());
-            timeKeeperTimeTextView.setText(project.getColor());
+            timeKeeperTimeTextView.setText(" ТУТА ВРЕМЯ!! ");
+            timeKeeperLayout.setBackgroundResource(project.getColor());
             timeKeeperLayout.setVisibility(View.VISIBLE);
+
+            mViewModel.insert(new Process(new Date(), project.getId(), "Оч долго"));
         }
     };
 

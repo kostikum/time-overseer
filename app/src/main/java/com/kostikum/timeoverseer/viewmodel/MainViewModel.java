@@ -5,8 +5,10 @@ import android.app.Application;
 import androidx.arch.core.util.Function;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import com.kostikum.timeoverseer.BasicApp;
 import com.kostikum.timeoverseer.adapters.DateItem;
 import com.kostikum.timeoverseer.adapters.GeneralItem;
 import com.kostikum.timeoverseer.adapters.ListItem;
@@ -33,7 +35,7 @@ public class MainViewModel extends AndroidViewModel {
 
     public MainViewModel(Application app) {
         super(app);
-        mRepository = new ProcessRepository(app);
+        mRepository = ((BasicApp) app).getRepository();
 
         mAllProcesses = mRepository.getAllProcesses();
         mAllProcessWithProjects = mRepository.getAllProcessesWithProjects();
@@ -70,10 +72,12 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<ListItem>> getAllListItems() {
-        return mConsolidatedListOfProcessesAndProjects;
-    }
-
-    public List<Process> getProcessesByDate(Date date) {
-        return mRepository.getProcessesByDate(date);
+        return Transformations
+                .map(mAllProcessWithProjects, new Function<List<ProcessWithProject>,  List<ListItem>>() {
+                    @Override
+                    public  List<ListItem> apply(List<ProcessWithProject> input) {
+                        return Utils.transformListOfProcessesAndProjects(input);
+                    }
+                });
     }
 }

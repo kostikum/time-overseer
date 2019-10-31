@@ -15,6 +15,7 @@ import com.kostikum.timeoverseer.db.entity.Project;
 import com.kostikum.timeoverseer.ui.DateCallback;
 import com.kostikum.timeoverseer.ui.ProjectCallback;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -72,10 +73,11 @@ public class ProcessListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 processViewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        projectCallback.onClick(new Project("тестовый", "бесцветный"));
+                        projectCallback.onClick(new Project("тестовый", R.color.light_green));
                     }
                 });
                 processViewHolder.titleTextView.setText(generalItem.getProject().getName());
+                processViewHolder.titleTextView.setBackgroundResource(generalItem.getProject().getColor());
                 processViewHolder.durationTextView.setText(generalItem.getProcess().getDuration());
                 break;
         }

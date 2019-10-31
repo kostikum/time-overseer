@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">Time Overseer</string>
+    <string name="project_name_edit_text">Project name</string>
+    <string name="color_text_view">Associated Color:</string>
+    <string name="create_project_button">Create</string>
+    <string name="track_text_view">Track</string>
+    <string name="timekeeper_stop_button">Stop</string>
+
+
+    <string name="green_radio_button">Green</string>
+    <string name="orange_radio_button">Orange</string>
+    <string name="pink_radio_button">Pink</string>
+    <string name="brown_radio_button">Brown</string>
+    <string name="olive_radio_button">Olive</string>
+    <string name="indigo_radio_button">Indigo</string>
+
+    <string name="grey_radio_button">Grey</string>
+    <string name="purple_radio_button">Purple</string>
+    <string name="red_radio_button">Red</string>
+    <string name="light_green_radio_button">Light green</string>
+    <string name="yellow_radio_button">Yellow</string>
+    <string name="blue_radio_button">Blue</string>
+
+
 </resources>

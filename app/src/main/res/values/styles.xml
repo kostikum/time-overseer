@@ -8,4 +8,17 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="ColorRadioButton" parent="Theme.AppCompat.Light.DarkActionBar">
+                <item name="android:layout_width">100dp</item>
+                <item name="android:layout_height">wrap_content</item>
+                <item name="android:textSize">20sp</item>
+<!--        <item name="android:layout_width">60dp</item>-->
+<!--        <item name="android:layout_height">60dp</item>-->
+<!--        <item name="android:scaleY">1.5</item>-->
+<!--        <item name="android:scaleX">1.5</item>-->
+<!--        <item name="android:button">@null</item>-->
+<!--        <item name="android:background">?android:attr/listChoiceIndicatorSingle</item>-->
+
+    </style>
+
 </resources>

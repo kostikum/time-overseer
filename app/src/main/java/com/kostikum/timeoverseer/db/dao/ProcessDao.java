@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
 
 import com.kostikum.timeoverseer.db.entity.Process;
 import com.kostikum.timeoverseer.db.entity.ProcessWithProject;
@@ -22,8 +23,9 @@ public interface ProcessDao {
     LiveData<List<Process>> getAllProcesses();
 
     @Query("SELECT * FROM process_table WHERE date = :date")
-    List<Process> getProcessesByDate(Date date);
+    LiveData<List<ProcessWithProject>> getProcessesWithProjectsByDate(Date date);
 
+    @Transaction
     @Query("SELECT * FROM process_table")
     LiveData<List<ProcessWithProject>> getProcessesWithProjects();
 }

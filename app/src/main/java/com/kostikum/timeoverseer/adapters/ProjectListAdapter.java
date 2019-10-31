@@ -44,7 +44,7 @@ public class ProjectListAdapter extends RecyclerView.Adapter<ProjectListAdapter.
             }
         });
         holder.nameTextView.setText(project.getName());
-        holder.colorTextView.setText(project.getColor());
+        holder.colorTextView.setBackgroundResource(project.getColor());
     }
 
     @Override

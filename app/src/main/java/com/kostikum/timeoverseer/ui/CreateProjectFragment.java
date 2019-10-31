@@ -4,7 +4,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +17,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.kostikum.timeoverseer.R;
 import com.kostikum.timeoverseer.db.entity.Project;
+import com.kostikum.timeoverseer.utils.Utils;
 import com.kostikum.timeoverseer.viewmodel.MainViewModel;
 
 public class CreateProjectFragment extends Fragment {
@@ -34,19 +38,63 @@ public class CreateProjectFragment extends Fragment {
     public void onViewCreated(@NonNull final View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        view.findViewById(R.id.creating_project_button).setOnClickListener(new View.OnClickListener() {
+        final RadioGroup radioGroupLeft = view.findViewById(R.id.radio_group_left);
+        final RadioGroup radioGroupRight = view.findViewById(R.id.radio_group_right);
+        final Button createButton = view.findViewById(R.id.creating_project_button);
+
+        RadioGroup.OnCheckedChangeListener listenerForLeft = new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton checkedRadioButton = view.findViewById(checkedId);
+                if (checkedRadioButton != null && checkedRadioButton.isChecked()) {
+                    radioGroupRight.clearCheck();
+                    createButton.setEnabled(true);
+                }
+            }
+        };
+
+        RadioGroup.OnCheckedChangeListener listenerForRight = new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                RadioButton checkedRadioButton = view.findViewById(checkedId);
+                if (checkedRadioButton != null && checkedRadioButton.isChecked()) {
+                    radioGroupLeft.clearCheck();
+                    createButton.setEnabled(true);
+                }
+            }
+        };
+
+        radioGroupLeft.setOnCheckedChangeListener(listenerForLeft);
+        radioGroupRight.setOnCheckedChangeListener(listenerForRight);
+
+
+
+
+        createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 String name = ((EditText) view.findViewById(R.id.project_name_edittext))
                         .getText().toString();
-                String color = ((EditText) view.findViewById(R.id.project_color_edittext))
-                        .getText().toString();
 
-                mViewModel.insert(new Project(name, color)); //new Project(name, color);
+                if (radioGroupLeft.getCheckedRadioButtonId() != -1) {
+                    int color = Utils.getColorId(radioGroupLeft.getCheckedRadioButtonId());
 
-                if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-                    ((MainActivity) getActivity()).showMainFragment();
+                    mViewModel.insert(new Project(name, color));
+
+                    if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                        ((MainActivity) getActivity()).showMainFragment();
+                    }
+                }
+
+                if (radioGroupRight.getCheckedRadioButtonId() != -1) {
+                    int color = Utils.getColorId(radioGroupRight.getCheckedRadioButtonId());
+
+                    mViewModel.insert(new Project(name, color));
+
+                    if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                        ((MainActivity) getActivity()).showMainFragment();
+                    }
                 }
             }
         });

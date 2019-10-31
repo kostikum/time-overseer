@@ -5,10 +5,10 @@ import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 
+import com.kostikum.timeoverseer.db.ProcessRoomDatabase;
+import com.kostikum.timeoverseer.db.dao.ProcessDao;
 import com.kostikum.timeoverseer.db.dao.ProjectDao;
 import com.kostikum.timeoverseer.db.entity.Process;
-import com.kostikum.timeoverseer.db.dao.ProcessDao;
-import com.kostikum.timeoverseer.db.ProcessRoomDatabase;
 import com.kostikum.timeoverseer.db.entity.ProcessWithProject;
 import com.kostikum.timeoverseer.db.entity.Project;
 
@@ -16,15 +16,17 @@ import java.util.Date;
 import java.util.List;
 
 public class ProcessRepository {
+    private static ProcessRepository sInstance;
 
     private ProcessDao mProcessDao;
     private ProjectDao mProjectDao;
 
     private LiveData<List<Process>> mAllProcesses;
     private LiveData<List<ProcessWithProject>> mAllProcessesWithProjects;
+    private LiveData<List<ProcessWithProject>> mAllProcessesWithProjectsByDate;
     private LiveData<List<Project>> mAllProjects;
 
-    public ProcessRepository(Application application) {
+    private ProcessRepository(Application application) {
         ProcessRoomDatabase database = ProcessRoomDatabase.getDatabase(application);
 
         mProcessDao = database.processDao();
@@ -35,6 +37,17 @@ public class ProcessRepository {
         mAllProjects = mProjectDao.getAllProjects();
     }
 
+    static ProcessRepository getInstance(final Application application) {
+        if (sInstance == null) {
+            synchronized (ProcessRepository.class) {
+                if (sInstance == null) {
+                    sInstance = new ProcessRepository(application);
+                }
+            }
+        }
+        return sInstance;
+    }
+
     public LiveData<List<Process>> getAllProcesses() {
         return mAllProcesses;
     }
@@ -43,8 +56,8 @@ public class ProcessRepository {
         return mAllProcessesWithProjects;
     }
 
-    public List<Process> getProcessesByDate(Date date) {
-        return mProcessDao.getProcessesByDate(date);
+    public LiveData<List<ProcessWithProject>> getAllProcessesWithProjectsByDate(Date date) {
+        return mProcessDao.getProcessesWithProjectsByDate(date);
     }
 
     public LiveData<List<Project>> getAllProjects() {
@@ -73,6 +86,7 @@ public class ProcessRepository {
             return null;
         }
     }
+
     private static class InsertProjectAsyncTask extends AsyncTask<Project, Void, Void> {
 
         private ProjectDao mAsyncTaskDao;
@@ -87,5 +101,4 @@ public class ProcessRepository {
             return null;
         }
     }
-
 }

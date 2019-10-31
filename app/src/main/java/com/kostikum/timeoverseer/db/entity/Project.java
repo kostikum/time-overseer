@@ -13,9 +13,9 @@ public class Project {
 
     private String name;
 
-    private String color;
+    private int color;
 
-    public Project(@NonNull String name, @NonNull String color) {
+    public Project(@NonNull String name, int color) {
         this.name = name;
         this.color = color;
     }
@@ -36,11 +36,11 @@ public class Project {
         this.name = name;
     }
 
-    public String getColor() {
+    public int getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(int color) {
         this.color = color;
     }
 }

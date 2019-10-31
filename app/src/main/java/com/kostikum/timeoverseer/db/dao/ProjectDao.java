@@ -11,7 +11,6 @@ import java.util.List;
 
 @Dao
 public interface ProjectDao {
-
     @Insert
     void insert(Project project);
 

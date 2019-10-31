@@ -10,6 +10,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.kostikum.timeoverseer.R;
 import com.kostikum.timeoverseer.db.converter.DateConverter;
 import com.kostikum.timeoverseer.db.dao.ProcessDao;
 import com.kostikum.timeoverseer.db.dao.ProjectDao;
@@ -85,10 +86,10 @@ public abstract class ProcessRoomDatabase extends RoomDatabase {
                 todayWithZeroTime = date;
             }
 
-            Project pr1 = new Project("Программирование", "Синий");
-            Project pr2 = new Project("Прогулка", "Жёлтый");
-            Project pr3 = new Project("Вязание", "Красный");
-            Project pr4 = new Project("Whistle blowing", "Blue");
+            Project pr1 = new Project("Программирование", R.color.blue);
+            Project pr2 = new Project("Прогулка", R.color.green);
+            Project pr3 = new Project("Вязание", R.color.red);
+            Project pr4 = new Project("Whistle blowing", R.color.yellow);
 
             mProjectDao.insert(pr1);
             mProjectDao.insert(pr2);

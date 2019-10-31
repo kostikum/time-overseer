@@ -38,7 +38,7 @@
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:text="Stop" />
+                android:text="@string/timekeeper_stop_button" />
 
         </LinearLayout>
 

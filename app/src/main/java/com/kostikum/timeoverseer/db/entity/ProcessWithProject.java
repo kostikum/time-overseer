@@ -4,7 +4,6 @@ import androidx.room.Embedded;
 import androidx.room.Relation;
 
 public class ProcessWithProject {
-
     @Embedded
     public Process process;
 

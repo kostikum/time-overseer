@@ -1,34 +1,40 @@
 package com.kostikum.timeoverseer.ui;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.kostikum.timeoverseer.R;
+import com.kostikum.timeoverseer.db.converter.DateConverter;
 import com.kostikum.timeoverseer.db.entity.Process;
+import com.kostikum.timeoverseer.db.entity.ProcessWithProject;
+import com.kostikum.timeoverseer.viewmodel.DatePieViewModel;
 import com.kostikum.timeoverseer.viewmodel.MainViewModel;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class DatePieFragment extends Fragment {
-
-    private Date date;
-    private MainViewModel viewModel;
+    private static final String KEY_DATE = "date_id";
     private DatePieView datePieView;
 
-    public static DatePieFragment newInstance(Date date) {
-        return new DatePieFragment(date);
-    }
-
-    public DatePieFragment(Date date) {
-        this.date = date;
+    static DatePieFragment newInstance(Date date) {
+        DatePieFragment fragment = new DatePieFragment();
+        Bundle args = new Bundle();
+        args.putLong(KEY_DATE, DateConverter.toTimestamp(date));
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Nullable
@@ -40,31 +46,37 @@ public class DatePieFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        float values[] = {0.25f, 0.25f, 0.25f, 0.25f};
-
         datePieView = view.findViewById(R.id.date_pie_view);
-        datePieView.setData(values);
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
 
+        DatePieViewModel.Factory factory = new DatePieViewModel.Factory(
+                requireActivity().getApplication(),
+                DateConverter.toDate(getArguments().getLong(KEY_DATE)));
 
-        List<Process> list = viewModel.getProcessesByDate(date);
+        DatePieViewModel viewModel = ViewModelProviders
+                .of(getActivity(), factory).get(DatePieViewModel.class);
+        final List<ProcessWithProject> list = viewModel.getProcessesAndProjectsByDate().getValue();
+        setData(list);
+        viewModel.getProcessesAndProjectsByDate().observe(this,
+                new Observer<List<ProcessWithProject>>() {
+            @Override
+            public void onChanged(List<ProcessWithProject> processes) {
+                setData(processes);
+            }
+        });
+    }
 
-        float total = 0;
-        for (int i = 0; i < list.size(); i++) {
-            total += Integer.parseInt(list.get(i).getDuration());
+    private void setData(List<ProcessWithProject> list) {
+        if (list != null && !list.isEmpty()) {
+            List<Pair<Long, Integer>> pairs = new ArrayList<>();
+            for (ProcessWithProject pr : list) {
+                pairs.add(new Pair<>(pr.process.getId(), pr.project.getColor()));
+            }
+            datePieView.setData(pairs);
         }
-        float[] value_degree = new float[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            value_degree[i] = 360 * (Integer.parseInt(list.get(i).getDuration()) / total);
-        }
-
-
-        datePieView.setData(value_degree);
     }
 }

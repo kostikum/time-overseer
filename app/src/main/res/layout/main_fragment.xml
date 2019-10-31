@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_add_circle_black_24dp"
         app:layout_anchor="@id/bottom_sheet"
-        app:layout_anchorGravity="top|center" />
+        app:layout_anchorGravity="top|right"
+        android:layout_margin="10dp"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

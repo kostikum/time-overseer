@@ -4,11 +4,11 @@
     android:id="@+id/rv_project_item_layout"
     android:layout_width="match_parent"
     android:padding="10dp"
-    android:layout_height="60dp">
+    android:layout_height="50dp">
 
     <TextView
         android:id="@+id/project_name_textview"
-        android:textSize="25sp"
+        android:textSize="20sp"
         android:layout_gravity="start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
@@ -16,9 +16,11 @@
     <TextView
         android:id="@+id/project_color_textview"
         android:layout_gravity="end"
-        android:textSize="25sp"
+        android:textSize="20sp"
+        android:padding="2dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:drawableEnd="@drawable/ic_play_circle_filled_black_24dp" />
+        android:drawableStart="@drawable/ic_play_circle_filled_black_24dp"
+        android:text="@string/track_text_view"/>
 
 </FrameLayout>
