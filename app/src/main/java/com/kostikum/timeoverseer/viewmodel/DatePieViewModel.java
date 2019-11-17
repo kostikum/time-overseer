@@ -32,18 +32,6 @@ public class DatePieViewModel extends AndroidViewModel {
         mRepository = ((BasicApp) app).getRepository();
         mAllProcWProj = mRepository.getAllProcessesWithProjects();
         mAllProcWProjByDate = mRepository.getAllProcessesWithProjectsByDate(date);
-//        mAllProcWProjByDate = Transformations.map(mAllProcWProj, new Function<List<ProcessWithProject>, List<ProcessWithProject>>() {
-//            @Override
-//            public List<ProcessWithProject> apply(List<ProcessWithProject> input) {
-//                List<ProcessWithProject> newList = new ArrayList<>();
-//                for (ProcessWithProject processWithProject : input) {
-//                    if (processWithProject.process.getDate().equals(date)) {
-//                        newList.add(processWithProject);
-//                    }
-//                }
-//                return newList;
-//            }
-//        });
     }
 
     public LiveData<List<ProcessWithProject>> getProcessesAndProjectsByDate() {

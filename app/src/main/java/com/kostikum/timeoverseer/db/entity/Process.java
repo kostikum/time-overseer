@@ -16,9 +16,9 @@ public class Process {
     private long id;
     private Date date;
     private long project_id;
-    private String duration;
+    private int duration;
 
-    public Process(Date date, long project_id, String duration) {
+    public Process(Date date, long project_id, int duration) {
         this.date = date;
         this.project_id = project_id;
         this.duration = duration;
@@ -48,11 +48,12 @@ public class Process {
         this.project_id = project_id;
     }
 
-    public String getDuration() {
+    public int getDuration() {
         return duration;
     }
 
-    public void setDuration(String duration) {
+    public void setDuration(int duration) {
         this.duration = duration;
     }
 }
+

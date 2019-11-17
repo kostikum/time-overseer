@@ -28,6 +28,8 @@ import com.kostikum.timeoverseer.db.entity.Process;
 import com.kostikum.timeoverseer.db.entity.Project;
 import com.kostikum.timeoverseer.viewmodel.MainViewModel;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -121,7 +123,15 @@ public class MainFragment extends Fragment {
             timeKeeperLayout.setBackgroundResource(project.getColor());
             timeKeeperLayout.setVisibility(View.VISIBLE);
 
-            mViewModel.insert(new Process(new Date(), project.getId(), "Оч долго"));
+            Date date = new Date();
+
+            DateFormat dateFormat = DateFormat.getDateInstance();
+
+            try {
+                date = dateFormat.parse(dateFormat.format(date));
+            } catch (ParseException e) {
+            }
+            mViewModel.insert(new Process(date, project.getId(), 500));
         }
     };
 

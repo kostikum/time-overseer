@@ -6,6 +6,10 @@ import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,6 +31,7 @@ import java.util.List;
 
 public class DatePieFragment extends Fragment {
     private static final String KEY_DATE = "date_id";
+    private LinearLayout linearLayout;
     private DatePieView datePieView;
 
     static DatePieFragment newInstance(Date date) {
@@ -46,6 +51,7 @@ public class DatePieFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        linearLayout = view.findViewById(R.id.under_the_pie_layout);
         datePieView = view.findViewById(R.id.date_pie_view);
     }
 
@@ -61,11 +67,13 @@ public class DatePieFragment extends Fragment {
                 .of(getActivity(), factory).get(DatePieViewModel.class);
         final List<ProcessWithProject> list = viewModel.getProcessesAndProjectsByDate().getValue();
         setData(list);
+        addProjectViews(list);
         viewModel.getProcessesAndProjectsByDate().observe(this,
                 new Observer<List<ProcessWithProject>>() {
             @Override
             public void onChanged(List<ProcessWithProject> processes) {
                 setData(processes);
+                addProjectViews(processes);
             }
         });
     }
@@ -74,9 +82,21 @@ public class DatePieFragment extends Fragment {
         if (list != null && !list.isEmpty()) {
             List<Pair<Long, Integer>> pairs = new ArrayList<>();
             for (ProcessWithProject pr : list) {
-                pairs.add(new Pair<>(pr.process.getId(), pr.project.getColor()));
+                pairs.add(new Pair<>((long) pr.process.getDuration(), pr.project.getColor()));
             }
             datePieView.setData(pairs);
+        }
+    }
+
+    private void addProjectViews(List<ProcessWithProject> list) {
+        if (list != null && !list.isEmpty()) {
+            for (ProcessWithProject pr : list) {
+                TextView tv = new TextView(getActivity());
+                tv.setText(pr.project.getName());
+                tv.setBackgroundColor(getResources().getColor(pr.project.getColor()));
+                tv.setPadding(2, 2, 2, 2);
+                linearLayout.addView(tv);
+            }
         }
     }
 }

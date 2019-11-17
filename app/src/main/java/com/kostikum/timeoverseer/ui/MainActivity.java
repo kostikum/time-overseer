@@ -2,9 +2,11 @@ package com.kostikum.timeoverseer.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.kostikum.timeoverseer.R;
+import com.kostikum.timeoverseer.services.TimerService;
 
 import java.util.Date;
 
@@ -17,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             showMainFragment();
         }
+        startService(new Intent(this, TimerService.class));
     }
 
     public void showMainFragment() {

@@ -104,10 +104,10 @@ public abstract class ProcessRoomDatabase extends RoomDatabase {
             }
 
 
-            mProcessDao.insert(new Process(todayWithZeroTime, 1,"25 min"));
-            mProcessDao.insert(new Process(todayWithZeroTime, 2, "158 hours"));
-            mProcessDao.insert(new Process(todayWithZeroTime, 4, "100 солнечных лет"));
-            mProcessDao.insert(new Process(todayWithZeroTime, 4, "100 солнечных дней"));
+            mProcessDao.insert(new Process(todayWithZeroTime, 1,25));
+            mProcessDao.insert(new Process(todayWithZeroTime, 2, 100));
+            mProcessDao.insert(new Process(todayWithZeroTime, 4, 80));
+            mProcessDao.insert(new Process(todayWithZeroTime, 4, 50));
 
 
 

@@ -20,6 +20,7 @@
     <string name="light_green_radio_button">Light green</string>
     <string name="yellow_radio_button">Yellow</string>
     <string name="blue_radio_button">Blue</string>
+    <string name="daily_report_text_view">Daily report:</string>
 
 
 </resources>

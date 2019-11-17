@@ -40,7 +40,7 @@ public class DatePieView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         int min = Math.min(w, h);
         if (min == w) {
-            rectf = new RectF(10, 10, min - 10, min - 10);
+            rectf = new RectF(20, 20, min - 20, min - 20);
         } else {
             rectf = new RectF(10, 10, min / 3, min / 3);
         }

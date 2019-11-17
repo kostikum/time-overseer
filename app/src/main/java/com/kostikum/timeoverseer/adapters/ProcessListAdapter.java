@@ -15,9 +15,11 @@ import com.kostikum.timeoverseer.db.entity.Project;
 import com.kostikum.timeoverseer.ui.DateCallback;
 import com.kostikum.timeoverseer.ui.ProjectCallback;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class ProcessListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -65,7 +67,9 @@ public class ProcessListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                         dateCallback.onClick(dateItem.getDate());
                     }
                 });
-                dateViewHolder.dateTextView.setText(dateItem.getDate().toString());
+                SimpleDateFormat newFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
+                String text = newFormat.format(dateItem.getDate());
+                dateViewHolder.dateTextView.setText(text);
                 break;
             case ListItem.TYPE_GENERAL:
                 GeneralItem generalItem = (GeneralItem) consolidatedList.get(position);
@@ -77,8 +81,9 @@ public class ProcessListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                     }
                 });
                 processViewHolder.titleTextView.setText(generalItem.getProject().getName());
-                processViewHolder.titleTextView.setBackgroundResource(generalItem.getProject().getColor());
-                processViewHolder.durationTextView.setText(generalItem.getProcess().getDuration());
+                processViewHolder.titleTextView
+                        .setBackgroundResource(generalItem.getProject().getColor());
+                processViewHolder.durationTextView.setText(Integer.toString(generalItem.getProcess().getDuration()));
                 break;
         }
     }
