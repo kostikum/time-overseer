@@ -12,11 +12,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -26,6 +29,7 @@ import com.kostikum.timeoverseer.adapters.ProjectListAdapter;
 import com.kostikum.timeoverseer.adapters.ListItem;
 import com.kostikum.timeoverseer.db.entity.Process;
 import com.kostikum.timeoverseer.db.entity.Project;
+import com.kostikum.timeoverseer.utils.Utils;
 import com.kostikum.timeoverseer.viewmodel.MainViewModel;
 
 import java.text.DateFormat;
@@ -44,6 +48,26 @@ public class MainFragment extends Fragment {
     private TextView timeKeeperTitleTextView;
     private TextView timeKeeperTimeTextView;
     private LinearLayout timeKeeperLayout;
+
+    private Boolean isRunning = false;
+    private Handler updateHandler = new Handler();
+    private long uptimeAtStart = 0L;
+    private int totalTicks = 0;
+    private int currentTicks = 0;
+    private long UPDATE_INTERVAL = 1000L;
+    private Process currentProcess;
+    private long currentProjectId;
+    private Runnable updateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isRunning) {
+                updateDisplayedText();
+                totalTicks++;
+                currentTicks++;
+                updateHandler.postAtTime(this, uptimeAtStart + currentTicks * UPDATE_INTERVAL);
+            }
+        }
+    };
 
     static MainFragment newInstance() {
         return new MainFragment();
@@ -81,6 +105,8 @@ public class MainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 timeKeeperLayout.setVisibility(View.GONE);
+                isRunning = !isRunning;
+                updateStopwatchState(true);
             }
         });
 
@@ -119,21 +145,56 @@ public class MainFragment extends Fragment {
         @Override
         public void onClick(Project project) {
             timeKeeperTitleTextView.setText(project.getName());
-            timeKeeperTimeTextView.setText(" ТУТА ВРЕМЯ!! ");
             timeKeeperLayout.setBackgroundResource(project.getColor());
             timeKeeperLayout.setVisibility(View.VISIBLE);
 
-            Date date = new Date();
+            currentProjectId = project.getId();
 
-            DateFormat dateFormat = DateFormat.getDateInstance();
 
-            try {
-                date = dateFormat.parse(dateFormat.format(date));
-            } catch (ParseException e) {
-            }
-            mViewModel.insert(new Process(date, project.getId(), 500));
+            isRunning = !isRunning;
+            updateStopwatchState(true);
         }
     };
+
+    private void updateStopwatchState(Boolean setupTimeAtStart) {
+        //updateIcons();
+        //view.stopwatch_lap.beVisibleIf(isRunning);
+
+        if (isRunning) {
+            updateHandler.post(updateRunnable);
+            //view.stopwatch_reset.beVisible();
+            if (setupTimeAtStart) {
+                uptimeAtStart = SystemClock.uptimeMillis();
+            }
+        } else {
+            long session = currentTicks * UPDATE_INTERVAL;
+            long totalDuration = SystemClock.uptimeMillis() - uptimeAtStart + session;
+            updateHandler.removeCallbacksAndMessages(null);
+            Date date = new Date();
+            DateFormat dateFormat = DateFormat.getDateInstance();
+
+            try { date = dateFormat.parse(dateFormat.format(date)); } catch (ParseException e) { }
+            currentProcess = new Process(date, currentProjectId, (int) session);
+            mViewModel.insert(currentProcess);
+            currentTicks = 0;
+            totalTicks--;
+        }
+    }
+
+    private void updateDisplayedText() {
+        timeKeeperTimeTextView
+                .setText(Utils.formatStopwatchTime(totalTicks * UPDATE_INTERVAL));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (isRunning && !getActivity().isChangingConfigurations()) {
+            Toast.makeText(getContext(), "Tracking stopped", Toast.LENGTH_SHORT).show();
+        }
+        isRunning = false;
+        updateHandler.removeCallbacks(updateRunnable);
+    }
 
     private final DateCallback dateCallback = new DateCallback() {
         @Override

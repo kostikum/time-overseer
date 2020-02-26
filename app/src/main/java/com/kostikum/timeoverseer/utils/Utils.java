@@ -12,7 +12,9 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.TreeMap;
+import java.util.concurrent.TimeUnit;
 
 public class Utils {
     public static List<ListItem> transformList(List<Process> inputList) {
@@ -108,6 +110,20 @@ public class Utils {
             case R.id.blueRadioButton:
                 return R.color.blue;
                 default: return -1;
+        }
+    }
+
+    public static String formatStopwatchTime(Long input) {
+        long hours = TimeUnit.MILLISECONDS.toHours(input);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(input) - TimeUnit.HOURS.toMinutes(hours);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(input) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(input));
+
+        if (hours > 0L) {
+            String format = "%02d:%02d:%02d";
+            return String.format(Locale.ENGLISH, format, hours, minutes, seconds);
+        } else {
+            String format = "%02d:%02d";
+            return String.format(Locale.ENGLISH, format, minutes, seconds);
         }
     }
 }

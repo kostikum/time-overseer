@@ -6,11 +6,11 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
+import androidx.room.Update;
 
 import com.kostikum.timeoverseer.db.entity.Process;
 import com.kostikum.timeoverseer.db.entity.ProcessWithProject;
 
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -18,6 +18,9 @@ import java.util.List;
 public interface ProcessDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Process process);
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    void update(Process process);
 
     @Query("SELECT * FROM process_table")
     LiveData<List<Process>> getAllProcesses();

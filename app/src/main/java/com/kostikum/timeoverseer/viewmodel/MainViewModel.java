@@ -62,6 +62,10 @@ public class MainViewModel extends AndroidViewModel {
         mRepository.insert(process);
     }
 
+    public void update(Process process) {
+        mRepository.update(process);
+    }
+
     public void insert(Project project) {
         mRepository.insert(project);
     }

@@ -68,6 +68,10 @@ public class ProcessRepository {
         new InsertProcessAsyncTask(mProcessDao).execute(process);
     }
 
+    public void update(Process process) {
+        new UpdateProcessAsyncTask(mProcessDao).execute(process);
+     }
+
     public void insert(Project project) {
         new InsertProjectAsyncTask(mProjectDao).execute(project);
     }
@@ -83,6 +87,21 @@ public class ProcessRepository {
         @Override
         protected Void doInBackground(final Process... params) {
             mAsyncTaskDao.insert(params[0]);
+            return null;
+        }
+    }
+
+    private static class UpdateProcessAsyncTask extends AsyncTask<Process, Void, Void> {
+
+        private ProcessDao mAsyncTaskDao;
+
+        UpdateProcessAsyncTask(ProcessDao dao) {
+            this.mAsyncTaskDao = dao;
+        }
+
+        @Override
+        protected Void doInBackground(final Process... params) {
+            mAsyncTaskDao.update(params[0]);
             return null;
         }
     }

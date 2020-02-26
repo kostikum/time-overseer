@@ -14,9 +14,9 @@ import com.kostikum.timeoverseer.R;
 import com.kostikum.timeoverseer.db.entity.Project;
 import com.kostikum.timeoverseer.ui.DateCallback;
 import com.kostikum.timeoverseer.ui.ProjectCallback;
+import com.kostikum.timeoverseer.utils.Utils;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -83,7 +83,8 @@ public class ProcessListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 processViewHolder.titleTextView.setText(generalItem.getProject().getName());
                 processViewHolder.titleTextView
                         .setBackgroundResource(generalItem.getProject().getColor());
-                processViewHolder.durationTextView.setText(Integer.toString(generalItem.getProcess().getDuration()));
+                processViewHolder.durationTextView
+                        .setText(Utils.formatStopwatchTime((long) generalItem.getProcess().getDuration()));
                 break;
         }
     }
