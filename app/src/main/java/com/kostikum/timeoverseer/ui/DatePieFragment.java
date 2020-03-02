@@ -25,6 +25,8 @@ import com.kostikum.timeoverseer.db.entity.ProcessWithProject;
 import com.kostikum.timeoverseer.viewmodel.DatePieViewModel;
 import com.kostikum.timeoverseer.viewmodel.MainViewModel;
 
+import org.joda.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -34,10 +36,10 @@ public class DatePieFragment extends Fragment {
     private LinearLayout linearLayout;
     private DatePieView datePieView;
 
-    static DatePieFragment newInstance(Date date) {
+    static DatePieFragment newInstance(LocalDate localDate) {
         DatePieFragment fragment = new DatePieFragment();
         Bundle args = new Bundle();
-        args.putLong(KEY_DATE, DateConverter.toTimestamp(date));
+        args.putString(KEY_DATE, DateConverter.toString(localDate));
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,7 +63,7 @@ public class DatePieFragment extends Fragment {
 
         DatePieViewModel.Factory factory = new DatePieViewModel.Factory(
                 requireActivity().getApplication(),
-                DateConverter.toDate(getArguments().getLong(KEY_DATE)));
+                DateConverter.toDate(getArguments().getString(KEY_DATE)));
 
         DatePieViewModel viewModel = ViewModelProviders
                 .of(getActivity(), factory).get(DatePieViewModel.class);

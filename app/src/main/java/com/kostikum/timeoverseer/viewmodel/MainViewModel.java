@@ -70,9 +70,12 @@ public class MainViewModel extends AndroidViewModel {
         mRepository.insert(project);
     }
 
-
     public LiveData<List<Project>> getAllProjects() {
         return mAllProjects;
+    }
+
+    public LiveData<List<ProcessWithProject>> getAllProcessWithProjects() {
+        return mAllProcessWithProjects;
     }
 
     public LiveData<List<ListItem>> getAllListItems() {

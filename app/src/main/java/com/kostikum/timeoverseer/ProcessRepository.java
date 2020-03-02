@@ -12,6 +12,8 @@ import com.kostikum.timeoverseer.db.entity.Process;
 import com.kostikum.timeoverseer.db.entity.ProcessWithProject;
 import com.kostikum.timeoverseer.db.entity.Project;
 
+import org.joda.time.LocalDate;
+
 import java.util.Date;
 import java.util.List;
 
@@ -56,8 +58,8 @@ public class ProcessRepository {
         return mAllProcessesWithProjects;
     }
 
-    public LiveData<List<ProcessWithProject>> getAllProcessesWithProjectsByDate(Date date) {
-        return mProcessDao.getProcessesWithProjectsByDate(date);
+    public LiveData<List<ProcessWithProject>> getAllProcessesWithProjectsByDate(LocalDate localDate) {
+        return mProcessDao.getProcessesWithProjectsByDate(localDate);
     }
 
     public LiveData<List<Project>> getAllProjects() {

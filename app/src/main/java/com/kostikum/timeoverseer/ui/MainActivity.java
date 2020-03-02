@@ -6,6 +6,8 @@ import android.os.Bundle;
 
 import com.kostikum.timeoverseer.R;
 
+import org.joda.time.LocalDate;
+
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,10 +34,10 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    public void showDatePieFragment(Date date) {
+    public void showDatePieFragment(LocalDate localDate) {
         getSupportFragmentManager().beginTransaction()
                 .addToBackStack("date_pie")
-                .replace(R.id.container, DatePieFragment.newInstance(date))
+                .replace(R.id.container, DatePieFragment.newInstance(localDate))
                 .commit();
     }
 }

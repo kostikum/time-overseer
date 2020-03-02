@@ -57,7 +57,7 @@ public class ProjectListAdapter extends RecyclerView.Adapter<ProjectListAdapter.
         notifyDataSetChanged();
     }
 
-    class ProjectViewHolder extends RecyclerView.ViewHolder {
+    static class ProjectViewHolder extends RecyclerView.ViewHolder {
         FrameLayout frameLayout;
         TextView nameTextView;
         TextView colorTextView;

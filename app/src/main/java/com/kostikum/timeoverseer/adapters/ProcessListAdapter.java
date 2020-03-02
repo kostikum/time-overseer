@@ -64,20 +64,19 @@ public class ProcessListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 dateViewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dateCallback.onClick(dateItem.getDate());
+                        dateCallback.onClick(dateItem.getLocalDate());
                     }
                 });
-                SimpleDateFormat newFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.US);
-                String text = newFormat.format(dateItem.getDate());
+                String text = dateItem.getLocalDate().toString("dd MMMM yyyy");
                 dateViewHolder.dateTextView.setText(text);
                 break;
             case ListItem.TYPE_GENERAL:
-                GeneralItem generalItem = (GeneralItem) consolidatedList.get(position);
+                final GeneralItem generalItem = (GeneralItem) consolidatedList.get(position);
                 ProcessViewHolder processViewHolder = (ProcessViewHolder) holder;
                 processViewHolder.frameLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        projectCallback.onClick(new Project("тестовый", R.color.light_green));
+                        projectCallback.onClick(generalItem.getProject());
                     }
                 });
                 processViewHolder.titleTextView.setText(generalItem.getProject().getName());

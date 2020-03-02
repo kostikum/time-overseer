@@ -2,6 +2,7 @@ package com.kostikum.timeoverseer.ui;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.os.Bundle;
@@ -28,12 +29,16 @@ import com.kostikum.timeoverseer.adapters.ProcessListAdapter;
 import com.kostikum.timeoverseer.adapters.ProjectListAdapter;
 import com.kostikum.timeoverseer.adapters.ListItem;
 import com.kostikum.timeoverseer.db.entity.Process;
+import com.kostikum.timeoverseer.db.entity.ProcessWithProject;
 import com.kostikum.timeoverseer.db.entity.Project;
 import com.kostikum.timeoverseer.utils.Utils;
 import com.kostikum.timeoverseer.viewmodel.MainViewModel;
 
+import org.joda.time.LocalDate;
+
 import java.text.DateFormat;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -106,7 +111,7 @@ public class MainFragment extends Fragment {
             public void onClick(View v) {
                 timeKeeperLayout.setVisibility(View.GONE);
                 isRunning = !isRunning;
-                updateStopwatchState(true);
+                updateStopwatchState();
             }
         });
 
@@ -126,14 +131,14 @@ public class MainFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         mViewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         processAdapter.setProcessesList(mViewModel.getAllListItems().getValue());
-        mViewModel.getAllListItems().observe(this, new Observer<List<ListItem>>() {
+        mViewModel.getAllListItems().observe(getViewLifecycleOwner(), new Observer<List<ListItem>>() {
             @Override
             public void onChanged(List<ListItem> listItems) {
                 behavior.setState(BottomSheetBehavior.STATE_HALF_EXPANDED);
                 processAdapter.setProcessesList(listItems);
             }
         });
-        mViewModel.getAllProjects().observe(this, new Observer<List<Project>>() {
+        mViewModel.getAllProjects().observe(getViewLifecycleOwner(), new Observer<List<Project>>() {
             @Override
             public void onChanged(List<Project> projects) {
                 projectAdapter.setProjectsList(projects);
@@ -144,37 +149,46 @@ public class MainFragment extends Fragment {
     private final ProjectCallback projectCallback = new ProjectCallback() {
         @Override
         public void onClick(Project project) {
+
+            LocalDate localDate = new LocalDate();
+
+            List<ProcessWithProject> allPAP = mViewModel.getAllProcessWithProjects().getValue();
+            currentProcess = null;
+            if (allPAP != null) {
+                for (ProcessWithProject pAP : allPAP) {
+                    if (pAP.process.getLocalDate().equals(localDate) &&
+                            pAP.project.getId() == project.getId()) {
+                        currentProcess = pAP.process;
+                    }
+                }
+
+                if (currentProcess == null) {
+                    currentProcess = new Process(localDate, project.getId(), 0);
+                }
+            }
+
             timeKeeperTitleTextView.setText(project.getName());
             timeKeeperLayout.setBackgroundResource(project.getColor());
             timeKeeperLayout.setVisibility(View.VISIBLE);
 
-            currentProjectId = project.getId();
-
-
             isRunning = !isRunning;
-            updateStopwatchState(true);
+            updateStopwatchState();
         }
     };
 
-    private void updateStopwatchState(Boolean setupTimeAtStart) {
-        //updateIcons();
-        //view.stopwatch_lap.beVisibleIf(isRunning);
+    private void updateStopwatchState() {
 
         if (isRunning) {
             updateHandler.post(updateRunnable);
             //view.stopwatch_reset.beVisible();
-            if (setupTimeAtStart) {
+            if (true) {
                 uptimeAtStart = SystemClock.uptimeMillis();
             }
         } else {
             long session = currentTicks * UPDATE_INTERVAL;
             long totalDuration = SystemClock.uptimeMillis() - uptimeAtStart + session;
             updateHandler.removeCallbacksAndMessages(null);
-            Date date = new Date();
-            DateFormat dateFormat = DateFormat.getDateInstance();
 
-            try { date = dateFormat.parse(dateFormat.format(date)); } catch (ParseException e) { }
-            currentProcess = new Process(date, currentProjectId, (int) session);
             mViewModel.insert(currentProcess);
             currentTicks = 0;
             totalTicks--;
@@ -198,9 +212,9 @@ public class MainFragment extends Fragment {
 
     private final DateCallback dateCallback = new DateCallback() {
         @Override
-        public void onClick(Date date) {
+        public void onClick(LocalDate localDate) {
             if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
-                ((MainActivity) getActivity()).showDatePieFragment(date);
+                ((MainActivity) getActivity()).showDatePieFragment(localDate);
             }
         }
     };

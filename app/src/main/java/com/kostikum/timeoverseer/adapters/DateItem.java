@@ -1,17 +1,17 @@
 package com.kostikum.timeoverseer.adapters;
 
-import java.util.Date;
+import org.joda.time.LocalDate;
 
 public class DateItem extends ListItem {
 
-    private Date date;
+    private LocalDate localDate;
 
-    public Date getDate() {
-        return date;
+    public LocalDate getLocalDate() {
+        return localDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setLocalDate(LocalDate localDate) {
+        this.localDate = localDate;
     }
 
     @Override

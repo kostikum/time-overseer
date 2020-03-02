@@ -11,7 +11,8 @@ import androidx.room.Update;
 import com.kostikum.timeoverseer.db.entity.Process;
 import com.kostikum.timeoverseer.db.entity.ProcessWithProject;
 
-import java.util.Date;
+import org.joda.time.LocalDate;
+
 import java.util.List;
 
 @Dao
@@ -25,8 +26,11 @@ public interface ProcessDao {
     @Query("SELECT * FROM process_table")
     LiveData<List<Process>> getAllProcesses();
 
-    @Query("SELECT * FROM process_table WHERE date = :date")
-    LiveData<List<ProcessWithProject>> getProcessesWithProjectsByDate(Date date);
+    @Query("SELECT * FROM process_table WHERE localDate = :localDate")
+    LiveData<List<ProcessWithProject>> getProcessesWithProjectsByDate(LocalDate localDate);
+
+    @Query("SELECT * FROM process_table WHERE localDate = :localDate AND project_id = :project_id")
+    LiveData<List<ProcessWithProject>> getProcessesWithProjectsByDateAndProject(LocalDate localDate, int project_id);
 
     @Transaction
     @Query("SELECT * FROM process_table")

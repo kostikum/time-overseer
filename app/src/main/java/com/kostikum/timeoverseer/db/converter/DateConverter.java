@@ -2,16 +2,16 @@ package com.kostikum.timeoverseer.db.converter;
 
 import androidx.room.TypeConverter;
 
-import java.util.Date;
+import org.joda.time.LocalDate;
 
 public class DateConverter {
     @TypeConverter
-    public static Date toDate(Long timestamp) {
-        return timestamp == null ? null : new Date(timestamp);
+    public static LocalDate toDate(String string) {
+        return string == null ? null : LocalDate.parse(string);
     }
 
     @TypeConverter
-    public static Long toTimestamp(Date date) {
-        return date == null ? null : date.getTime();
+    public static String toString(LocalDate localDate) {
+        return localDate == null ? null : localDate.toString();
     }
 }

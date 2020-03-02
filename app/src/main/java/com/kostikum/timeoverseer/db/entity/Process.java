@@ -3,6 +3,8 @@ package com.kostikum.timeoverseer.db.entity;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
+import org.joda.time.LocalDate;
+
 import java.util.Date;
 
 @Entity(tableName = "process_table")//,
@@ -14,12 +16,12 @@ public class Process {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
-    private Date date;
+    private LocalDate localDate;
     private long project_id;
     private int duration;
 
-    public Process(Date date, long project_id, int duration) {
-        this.date = date;
+    public Process(LocalDate localDate, long project_id, int duration) {
+        this.localDate = localDate;
         this.project_id = project_id;
         this.duration = duration;
     }
@@ -32,12 +34,12 @@ public class Process {
         this.id = id;
     }
 
-    public Date getDate() {
-        return date;
+    public LocalDate getLocalDate() {
+        return localDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setLocalDate(LocalDate localDate) {
+        this.localDate = localDate;
     }
 
     public long getProject_id() {

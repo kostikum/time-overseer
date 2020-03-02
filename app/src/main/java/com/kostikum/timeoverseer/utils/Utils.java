@@ -7,9 +7,10 @@ import com.kostikum.timeoverseer.adapters.ListItem;
 import com.kostikum.timeoverseer.db.entity.Process;
 import com.kostikum.timeoverseer.db.entity.ProcessWithProject;
 
+import org.joda.time.LocalDate;
+
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -18,11 +19,11 @@ import java.util.concurrent.TimeUnit;
 
 public class Utils {
     public static List<ListItem> transformList(List<Process> inputList) {
-        HashMap<Date, List<Process>> groupedHashMap = new HashMap<>();
+        HashMap<LocalDate, List<Process>> groupedHashMap = new HashMap<>();
         List<ListItem> consolidatedList = new ArrayList<>();
 
         for (Process process : inputList) {
-            Date hashMapKey = process.getDate();
+            LocalDate hashMapKey = process.getLocalDate();
             if (groupedHashMap.containsKey(hashMapKey)) {
                 groupedHashMap.get(hashMapKey).add(process);
             } else {
@@ -32,12 +33,12 @@ public class Utils {
             }
         }
 
-        for (Date date : groupedHashMap.keySet()) {
+        for (LocalDate localDate : groupedHashMap.keySet()) {
             DateItem dateItem = new DateItem();
-            dateItem.setDate(date);
+            dateItem.setLocalDate(localDate);
             consolidatedList.add(dateItem);
 
-            for (Process process : groupedHashMap.get(date)) {
+            for (Process process : groupedHashMap.get(localDate)) {
                 GeneralItem generalItem = new GeneralItem();
                 generalItem.setProcess(process);
                 consolidatedList.add(generalItem);
@@ -48,16 +49,16 @@ public class Utils {
 
     public static List<ListItem> transformListOfProcessesAndProjects(List<ProcessWithProject> inputList) {
 
-        TreeMap<Date, List<ProcessWithProject>> groupedTreeMap = new TreeMap<>(new Comparator<Date>() {
+        TreeMap<LocalDate, List<ProcessWithProject>> groupedTreeMap = new TreeMap<>(new Comparator<LocalDate>() {
             @Override
-            public int compare(Date o1, Date o2) {
-                return o1.before(o2) ? 1 : (o1.after(o2)) ? -1 : 0;
+            public int compare(LocalDate o1, LocalDate o2) {
+                return o1.compareTo(o2);
             }
         });
         List<ListItem> consolidatedList = new ArrayList<>();
 
         for (ProcessWithProject processWithProject : inputList) {
-            Date hashMapKey = processWithProject.process.getDate();
+            LocalDate hashMapKey = processWithProject.process.getLocalDate();
             if (groupedTreeMap.containsKey(hashMapKey)) {
                 groupedTreeMap.get(hashMapKey).add(processWithProject);
             } else {
@@ -68,12 +69,12 @@ public class Utils {
         }
 
 
-        for (Date date : groupedTreeMap.keySet()) {
+        for (LocalDate localDate : groupedTreeMap.keySet()) {
             DateItem dateItem = new DateItem();
-            dateItem.setDate(date);
+            dateItem.setLocalDate(localDate);
             consolidatedList.add(dateItem);
 
-            for (ProcessWithProject processWithProject : groupedTreeMap.get(date)) {
+            for (ProcessWithProject processWithProject : groupedTreeMap.get(localDate)) {
                 GeneralItem generalItem = new GeneralItem();
                 generalItem.setProcess(processWithProject.process);
                 generalItem.setProject(processWithProject.project);

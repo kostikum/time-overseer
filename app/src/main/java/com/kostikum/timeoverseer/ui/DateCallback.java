@@ -1,7 +1,7 @@
 package com.kostikum.timeoverseer.ui;
 
-import java.util.Date;
+import org.joda.time.LocalDate;
 
 public interface DateCallback {
-    void onClick(Date date);
+    void onClick(LocalDate localDate);
 }

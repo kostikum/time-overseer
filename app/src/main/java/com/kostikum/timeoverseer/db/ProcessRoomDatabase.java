@@ -17,10 +17,11 @@ import com.kostikum.timeoverseer.db.dao.ProjectDao;
 import com.kostikum.timeoverseer.db.entity.Process;
 import com.kostikum.timeoverseer.db.entity.Project;
 
+import org.joda.time.LocalDate;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Date;
 
 @Database(entities = {Process.class, Project.class}, version = 1)
@@ -104,10 +105,24 @@ public abstract class ProcessRoomDatabase extends RoomDatabase {
             }
 
 
-            mProcessDao.insert(new Process(todayWithZeroTime, 1,25));
-            mProcessDao.insert(new Process(todayWithZeroTime, 2, 100));
-            mProcessDao.insert(new Process(todayWithZeroTime, 4, 80));
-            mProcessDao.insert(new Process(todayWithZeroTime, 4, 50));
+            LocalDate experimental = new LocalDate(1999, 1, 1);
+
+            mProcessDao.insert(new Process(experimental, 1,25));
+            mProcessDao.insert(new Process(experimental, 2, 100));
+            mProcessDao.insert(new Process(experimental, 4, 80));
+            mProcessDao.insert(new Process(experimental, 4, 50));
+
+            LocalDate additional = new LocalDate(1677, 12, 31);
+
+            mProcessDao.insert(new Process(additional, 1,25));
+            mProcessDao.insert(new Process(additional, 2, 100));
+
+            LocalDate extra = new LocalDate(1887, 6, 12);
+
+            mProcessDao.insert(new Process(extra, 1,25));
+            mProcessDao.insert(new Process(new LocalDate(1500, 6, 12), 2, 100));
+            mProcessDao.insert(new Process(new LocalDate(1500, 3, 12), 2, 100));
+            mProcessDao.insert(new Process(new LocalDate(1500, 4, 12), 2, 100));
 
 
 
