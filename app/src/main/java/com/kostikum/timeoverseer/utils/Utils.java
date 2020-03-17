@@ -52,7 +52,7 @@ public class Utils {
         TreeMap<LocalDate, List<ProcessWithProject>> groupedTreeMap = new TreeMap<>(new Comparator<LocalDate>() {
             @Override
             public int compare(LocalDate o1, LocalDate o2) {
-                return o1.compareTo(o2);
+                return o2.compareTo(o1);
             }
         });
         List<ListItem> consolidatedList = new ArrayList<>();

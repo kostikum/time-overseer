@@ -16,6 +16,8 @@ import com.kostikum.timeoverseer.ui.DateCallback;
 import com.kostikum.timeoverseer.ui.ProjectCallback;
 import com.kostikum.timeoverseer.utils.Utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.ArrayList;
@@ -34,7 +36,7 @@ public class ProcessListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.dateCallback = dateCallback;
     }
 
-    @NonNull
+    @NotNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 

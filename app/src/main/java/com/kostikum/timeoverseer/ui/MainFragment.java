@@ -1,5 +1,6 @@
 package com.kostikum.timeoverseer.ui;
 
+import androidx.cardview.widget.CardView;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -53,6 +54,7 @@ public class MainFragment extends Fragment {
     private TextView timeKeeperTitleTextView;
     private TextView timeKeeperTimeTextView;
     private LinearLayout timeKeeperLayout;
+    private CardView timekeeperCardView;
 
     private Boolean isRunning = false;
     private Handler updateHandler = new Handler();
@@ -61,13 +63,12 @@ public class MainFragment extends Fragment {
     private int currentTicks = 0;
     private long UPDATE_INTERVAL = 1000L;
     private Process currentProcess;
-    private long currentProjectId;
+
     private Runnable updateRunnable = new Runnable() {
         @Override
         public void run() {
             if (isRunning) {
                 updateDisplayedText();
-                totalTicks++;
                 currentTicks++;
                 updateHandler.postAtTime(this, uptimeAtStart + currentTicks * UPDATE_INTERVAL);
             }
@@ -93,6 +94,7 @@ public class MainFragment extends Fragment {
         behavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
 
         timeKeeperLayout = view.findViewById(R.id.timekeeper_layout);
+        timekeeperCardView = view.findViewById(R.id.cardview);
         timeKeeperTitleTextView = view.findViewById(R.id.timekeeper_title_textview);
         timeKeeperTimeTextView = view.findViewById(R.id.timekeeper_time_textview);
 
@@ -109,14 +111,10 @@ public class MainFragment extends Fragment {
         view.findViewById(R.id.timekeeper_stop_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                timeKeeperLayout.setVisibility(View.GONE);
-                isRunning = !isRunning;
-                updateStopwatchState();
+                finishProcess();
             }
         });
-
-        FloatingActionButton startButton = view.findViewById(R.id.add_project_button);
-        startButton.setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.add_project_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
@@ -149,6 +147,9 @@ public class MainFragment extends Fragment {
     private final ProjectCallback projectCallback = new ProjectCallback() {
         @Override
         public void onClick(Project project) {
+            if (isRunning) {
+                finishProcess();
+            }
 
             LocalDate localDate = new LocalDate();
 
@@ -159,45 +160,46 @@ public class MainFragment extends Fragment {
                     if (pAP.process.getLocalDate().equals(localDate) &&
                             pAP.project.getId() == project.getId()) {
                         currentProcess = pAP.process;
+                        totalTicks = pAP.process.getDuration() / (int) UPDATE_INTERVAL;
                     }
                 }
 
                 if (currentProcess == null) {
                     currentProcess = new Process(localDate, project.getId(), 0);
+                    totalTicks = 0;
                 }
             }
 
             timeKeeperTitleTextView.setText(project.getName());
-            timeKeeperLayout.setBackgroundResource(project.getColor());
+            int color = getActivity().getResources().getColor(project.getColor());
+            timekeeperCardView.setCardBackgroundColor(color);
             timeKeeperLayout.setVisibility(View.VISIBLE);
 
-            isRunning = !isRunning;
-            updateStopwatchState();
+
+            isRunning = true;
+            timeKeeperLayout.setVisibility(View.VISIBLE);
+            uptimeAtStart = SystemClock.uptimeMillis();
+            updateHandler.post(updateRunnable);
         }
     };
 
-    private void updateStopwatchState() {
+    private void finishProcess() {
+        isRunning = false;
+        timeKeeperLayout.setVisibility(View.GONE);
 
-        if (isRunning) {
-            updateHandler.post(updateRunnable);
-            //view.stopwatch_reset.beVisible();
-            if (true) {
-                uptimeAtStart = SystemClock.uptimeMillis();
-            }
-        } else {
-            long session = currentTicks * UPDATE_INTERVAL;
-            long totalDuration = SystemClock.uptimeMillis() - uptimeAtStart + session;
-            updateHandler.removeCallbacksAndMessages(null);
+        long session = (totalTicks + currentTicks) * UPDATE_INTERVAL;
+        long totalDuration = SystemClock.uptimeMillis() - uptimeAtStart + session;
+        updateHandler.removeCallbacksAndMessages(null);
 
-            mViewModel.insert(currentProcess);
-            currentTicks = 0;
-            totalTicks--;
-        }
+        currentProcess.setDuration((int) session);
+        mViewModel.insert(currentProcess);
+        currentTicks = 0;
+        totalTicks = 0;
     }
 
     private void updateDisplayedText() {
         timeKeeperTimeTextView
-                .setText(Utils.formatStopwatchTime(totalTicks * UPDATE_INTERVAL));
+                .setText(Utils.formatStopwatchTime((totalTicks + currentTicks) * UPDATE_INTERVAL));
     }
 
     @Override

@@ -29,9 +29,6 @@ public interface ProcessDao {
     @Query("SELECT * FROM process_table WHERE localDate = :localDate")
     LiveData<List<ProcessWithProject>> getProcessesWithProjectsByDate(LocalDate localDate);
 
-    @Query("SELECT * FROM process_table WHERE localDate = :localDate AND project_id = :project_id")
-    LiveData<List<ProcessWithProject>> getProcessesWithProjectsByDateAndProject(LocalDate localDate, int project_id);
-
     @Transaction
     @Query("SELECT * FROM process_table")
     LiveData<List<ProcessWithProject>> getProcessesWithProjects();
